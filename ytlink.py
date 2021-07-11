@@ -22,7 +22,6 @@ def get_video_data(ytid):
         response_text = response.read()
         data = json.loads(response_text.decode())
         #pprint.pprint(data)
-        print(data['title'])
     return data
 
 
