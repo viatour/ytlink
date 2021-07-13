@@ -6,11 +6,12 @@ from PIL import Image
 import urllib.request
 import json
 import urllib
+from pynput import keyboard
+from pynput.keyboard import Key
 import pprint
 
 
 filename = "thumbnail.jpg"
-
 
 def get_video_data(ytid):
     params = {"format": "json", "url": "https://www.youtube.com/watch?v=%s" % ytid}
@@ -23,6 +24,7 @@ def get_video_data(ytid):
         data = json.loads(response_text.decode())
         #pprint.pprint(data)
     return data
+
 
 
 def save_image(imgurl):
@@ -40,6 +42,28 @@ def send_to_clipboard(clip_type, data):
     win32clipboard.SetClipboardData(clip_type, data)
     win32clipboard.CloseClipboard()
 
+
+
+def on_release(key):
+    #handle released keys
+    if(key==Key.insert):
+        win32clipboard.OpenClipboard()
+        data = win32clipboard.GetClipboardData()
+        win32clipboard.CloseClipboard()
+        if("youtube" in data and " " not in data):
+            ytvideo = data
+            youtube_id = ytvideo.split("=")[1]
+            videodata = get_video_data(youtube_id)
+
+            thumbnail = videodata["thumbnail_url"]
+            title = videodata["title"]
+            linkplustitle = f"{ytvideo}\n\n{title}"
+
+            send_to_clipboard(win32clipboard.CF_UNICODETEXT, linkplustitle)
+
+while(True):
+    with keyboard.Listener(on_release=on_release) as listener:
+        listener.join()
 
 ytvideo = input("Youtube link?")
 youtube_id = ytvideo.split("=")[1]
