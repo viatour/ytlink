@@ -9,6 +9,7 @@ import urllib
 from pynput import keyboard
 from pynput.keyboard import Key
 import pprint
+import urlsplit
 
 
 filename = "thumbnail.jpg"
@@ -50,9 +51,10 @@ def on_release(key):
         win32clipboard.OpenClipboard()
         data = win32clipboard.GetClipboardData()
         win32clipboard.CloseClipboard()
-        if("youtube" in data and " " not in data):
+        if(("youtube" in data or "youtu.be" in data) and " " not in data):
             ytvideo = data
-            youtube_id = ytvideo.split("=")[1]
+            #youtube_id = ytvideo.split("=")[1]
+            youtube_id = urlsplit.get_yt_id(ytvideo)
             videodata = get_video_data(youtube_id)
 
             thumbnail = videodata["thumbnail_url"]
